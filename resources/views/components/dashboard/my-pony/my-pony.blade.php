@@ -22,7 +22,7 @@
                     <div class="mt-2 flex items-center gap-2 bg-slate-800 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm">
                         <span>{{ $userPony->poolFr }}</span>
                         <span class="w-1 h-1 rounded-full bg-slate-500"></span>
-                        <span class="{{ $teamPoolRanking < 2 ? 'text-emerald-400' : 'text-amber-400' }}">
+                        <span class="{{ $teamPoolRanking <= 2 ? 'text-emerald-400' : 'text-amber-400' }}">
                             {{ $teamPoolRanking }}{{ $teamPoolRanking === 1 ? 'er' : 'ème' }}
                         </span>
                     </div>
