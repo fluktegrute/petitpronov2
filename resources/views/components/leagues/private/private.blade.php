@@ -178,10 +178,12 @@
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                     <div x-show="showAdminModal" @click.away="showAdminModal = false" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                         <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-                            <h3 class="text-lg font-black text-slate-900" id="modal-title">Administration</h3>
+                            <h3 class="text-lg font-black text-slate-900" id="modal-title">Gérer la ligue</h3>
                             <button @click="showAdminModal = false" class="text-slate-400 hover:text-slate-600 transition-colors">
                                 <span class="sr-only">Fermer</span>
-                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
                             </button>
                         </div>
 
@@ -193,10 +195,23 @@
                                         {{ $league->invite_code }}
                                     </div>
                                     <button onclick="navigator.clipboard.writeText('{{ $league->invite_code }}'); alert('Code copié !');" class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-xl transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
                                     </button>
                                 </div>
                                 <p class="text-xs text-slate-500 mt-2">Partage ce code pour inviter de nouveaux joueurs à rejoindre la ligue.</p>
+                            </div>
+
+                            <hr class="border-slate-100">
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Description</label>
+                                <div class="flex items-center gap-3">
+                                    <textarea wire:model.live.debounce.200ms="description" rows="5" class="w-full border border-slate-200 rounded-xl px-3 py-2">
+                                        {{ $description }}
+                                    </textarea>
+                                </div>
                             </div>
 
                             <hr class="border-slate-100">

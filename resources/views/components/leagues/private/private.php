@@ -13,6 +13,7 @@ new class extends Component
 {
     public League $league;
     public bool $isUserAdmin = false;
+    public string $description = '';
 
     public function mount(string $code)
     {
@@ -25,6 +26,8 @@ new class extends Component
 
         if(auth()->id() === $this->league->owner_id)
             $this->isUserAdmin = true;
+
+        $this->description = $this->league->description ?? '';
     }
 
     #[Computed]
@@ -123,5 +126,10 @@ new class extends Component
 
         session()->flash('success', 'Joueur expulsé de la ligue avec succès.');        
         return redirect()->route('leagues.private', ['code' => $this->league->invite_code]);
+    }
+
+    public function updatedDescription(): void
+    {
+        $this->league->update(['description' => $this->description]);
     }
 };
