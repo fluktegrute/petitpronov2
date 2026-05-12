@@ -79,7 +79,6 @@ Les paramètres suivants sont personnalisables :
 ## TODO
 - Admin des ligues (code & gestion des joueurs/ligue)
 - Check responsive
-- Fichier d'import historique à dé-gitignorer
 - Update des points dans README (avec les cotes)
 - Screenshots du README
 
