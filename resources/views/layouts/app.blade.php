@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>PonyBet</title>
+    <title>{{ config('app.name') }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -24,7 +24,7 @@
                 <div class="flex">
                     <a href="{{ route('dashboard') }}" class="flex-shrink-0 flex items-center gap-3">
                         <img class="h-10 w-auto" src="{{ asset('storage/images/logo.png') }}" alt="Logo">
-                        <span class="font-extrabold text-xl tracking-tight text-indigo-950 hidden sm:block">PonyBet</span>
+                        <span class="font-extrabold text-xl tracking-tight text-indigo-950 hidden sm:block">{{ config('app.name') }}</span>
                     </a>
 
                     <div class="hidden sm:ml-8 sm:flex sm:space-x-8">

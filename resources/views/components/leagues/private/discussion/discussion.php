@@ -41,10 +41,16 @@ new class extends Component
             ]
         );
 
+        $formattedBody = preg_replace(
+            '/<a[^>]*href="([^"]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^"]*)?)"[^>]*>.*?<\/a>/i',
+            '<img src="$1" class="rounded-lg max-h-64 object-contain mt-2 mb-2" loading="lazy">',
+            $this->body
+        );
+
         Message::create([
             'league_id' => $this->leagueId,
             'user_id' => auth()->id(),
-            'content' => $this->body,
+            'content' => $formattedBody,
         ]);
 
         $this->body = '';

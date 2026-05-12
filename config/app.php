@@ -128,7 +128,7 @@ return [
     'exact_score_points' => env('EXACT_SCORE_POINTS', 30),
     'winning_prono_points' => env('WINNING_PRONO_POINTS', 10),
     'exact_score_odds_multiplier' => env('EXACT_SCORE_ODDS_MULTIPLIER', 30),
-    'winning_prono_odds_multiplier' => env('EXACT_SCORE_ODDS_MULTIPLIER', 10),
+    'winning_prono_odds_multiplier' => env('WINNING_PRONO_ODDS_MULTIPLIER', 10),
     'winner_prono_points' => env('WINNER_PRONO_POINTS', 50),
     'booster_multiplier' => env('BOOSTER_MULTIPLIER', 2),
     'initial_booster_quantity' => env('INITIAL_BOOSTER_QUANTITY', 3),

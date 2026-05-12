@@ -1,4 +1,4 @@
-<div wire:poll.10s class="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col h-[600px] overflow-hidden">
+<div wire:poll.10s class="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col h-[80vh] overflow-hidden">
     
     <div class="bg-indigo-900 px-5 py-4 border-b border-indigo-800 flex justify-between items-center shrink-0">
         <h3 class="font-black text-white flex items-center gap-2">
@@ -10,7 +10,7 @@
         </span>
     </div>
 
-    <div class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col-reverse bg-slate-50/50">
+    <div class="flex-1 overflow-y-auto p-4 flex flex-col-reverse bg-slate-50/50 gap-4">
         @forelse($this->messages as $msg)
             @php $isUser = $msg->user_id === auth()->id(); @endphp
             
@@ -48,20 +48,46 @@
          x-data="{
             value: @entangle('body'),
             init() {
-                // Vide l'éditeur quand le message est envoyé
                 window.addEventListener('message-sent', () => {
                     this.$refs.trix.editor.setSelectedRange([0, 65535]);
                     this.$refs.trix.editor.deleteInDirection('forward');
                 });
             }
          }"
-         @trix-change="value = $event.target.value">
-        
-        <form wire:submit="sendMessage" class="relative">
+         @trix-change="value = $event.target.value"
+         @trix-file-accept="$event.preventDefault()"> <form wire:submit="sendMessage" class="relative">
             <input id="trix-input" type="hidden">
             
+            <style>
+                /* Masque le bouton d'upload */
+                trix-toolbar .trix-button-group--file-tools { 
+                    display: none !important; 
+                }
+
+                /* Autorise le retour à la ligne et réduit l'espacement global */
+                trix-toolbar .trix-button-row { 
+                    flex-wrap: wrap !important; 
+                    gap: 4px !important;
+                    justify-content: flex-start !important;
+                }
+                
+                /* Retire les marges entre les groupes */
+                trix-toolbar .trix-button-group { 
+                    margin: 0 0 4px 0 !important; 
+                }
+
+                /* Compacte les boutons */
+                trix-toolbar .trix-button {
+                    min-width: 28px !important;
+                    height: 28px !important;
+                    padding: 0 4px !important;
+                }
+            </style>
+
             <div wire:ignore class="rounded-xl overflow-hidden border border-slate-300 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all [&_trix-toolbar]:border-b-0 [&_trix-toolbar]:bg-slate-50 [&_trix-toolbar]:px-2 [&_trix-toolbar]:pt-2 [&_trix-editor]:min-h-[80px] [&_trix-editor]:max-h-[150px] [&_trix-editor]:overflow-y-auto [&_trix-editor]:bg-white [&_trix-editor]:border-none">
-                <trix-editor x-ref="trix" input="trix-input" class="prose prose-sm focus:outline-none" placeholder="Lancer un débat..."></trix-editor>
+                
+                <trix-editor x-ref="trix" input="trix-input" class="prose prose-sm focus:outline-none" placeholder="Participe au débat !"></trix-editor>
+            
             </div>
 
             <div class="flex justify-between items-center mt-2">
