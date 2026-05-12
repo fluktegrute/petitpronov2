@@ -77,10 +77,10 @@ Les paramètres suivants sont personnalisables :
 - Nombre de boosters disponibles par joueur (variable d'environnement **INITIAL_BOOSTER_QUANTITY**), par défaut 3
 
 ## TODO
-- Admin des ligues (code & gestion des joueurs/ligue)
-- Check responsive
 - Update des points dans README (avec les cotes)
 - Screenshots du README
+- Intégration hCaptcha
+- Visuel page de login
 
 ## Licence
 

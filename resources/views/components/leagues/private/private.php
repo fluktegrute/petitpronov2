@@ -12,7 +12,7 @@ use App\Models\User;
 new class extends Component
 {
     public League $league;
-    public bool $discussionOpened = false;
+    public bool $isUserAdmin = false;
 
     public function mount(string $code)
     {
@@ -22,6 +22,9 @@ new class extends Component
             session()->flash('error', 'Tu ne fais pas partie de cette ligue !');
             return redirect()->route('leagues');
         }
+
+        if(auth()->id() === $this->league->owner_id)
+            $this->isUserAdmin = true;
     }
 
     #[Computed]
@@ -100,8 +103,25 @@ new class extends Component
         });
     }
 
-    public function openDiscussion(): void 
+    #[Computed]
+    public function allMembers(): Collection
     {
-        $this->discussionOpened = true;
+        return $this->league->users()->orderBy('name')->get();
+    }
+
+    public function removeUser(int $userId)
+    {
+        if(!$this->isUserAdmin)
+            abort(403, 'Action non autorisée.');
+
+        if($userId === auth()->id()){
+            session()->flash('error', 'Tu ne peux pas quitter ta propre ligue ici.');
+            return;
+        }
+
+        $this->league->users()->detach($userId);
+
+        session()->flash('success', 'Joueur expulsé de la ligue avec succès.');        
+        return redirect()->route('leagues.private', ['code' => $this->league->invite_code]);
     }
 };
