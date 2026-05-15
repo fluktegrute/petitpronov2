@@ -17,7 +17,7 @@ new class extends Component
     {
         $rules = [
             'name' => 'required|string|min:3|max:100',
-            'description' => 'max:500',
+            'description' => 'max:1000',
         ];
         $messages = [
             'name.required' => 'Le nom de ta ligue est requis',
@@ -30,7 +30,7 @@ new class extends Component
 
         $league = League::create([
             'name' => $this->name,
-            'description' => $this->description,
+            'description' => $this->description ?? '',
             'invite_code' => $this->createInviteCode(),
             'owner_id' => auth()->id(),
         ]);

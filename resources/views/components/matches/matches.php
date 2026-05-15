@@ -124,8 +124,8 @@ new class extends Component
             Prediction::create([
                 'user_id'    => $user->id,
                 'game_id'    => $gameId,
-                'home_score' => $pronoData['home_score'] !== '' ? $pronoData['home_score'] : null,
-                'away_score' => $pronoData['away_score'] !== '' ? $pronoData['away_score'] : null,
+                'home_score' => isset($pronoData['home_score']) && $pronoData['home_score'] !== '' ? $pronoData['home_score'] : null,
+                'away_score' => isset($pronoData['away_score']) && $pronoData['away_score'] !== '' ? $pronoData['away_score'] : null,
                 'is_boosted' => $canBoost,
                 'status'     => 'placed',
             ]);
@@ -152,8 +152,8 @@ new class extends Component
             }
 
             $prediction->update([
-                'home_score' => $pronoData['home_score'] !== '' ? $pronoData['home_score'] : null,
-                'away_score' => $pronoData['away_score'] !== '' ? $pronoData['away_score'] : null,
+                'home_score' => isset($pronoData['home_score']) && $pronoData['home_score'] !== '' ? $pronoData['home_score'] : null,
+                'away_score' => isset($pronoData['away_score']) && $pronoData['away_score'] !== '' ? $pronoData['away_score'] : null,
                 'is_boosted' => $boostStatus,
             ]);
         }
