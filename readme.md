@@ -80,7 +80,6 @@ Les paramètres suivants sont personnalisables :
 - Update des points dans README (avec les cotes)
 - Screenshots du README
 - Intégration hCaptcha
-- Visuel page de login
 
 ## Licence
 

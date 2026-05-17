@@ -51,6 +51,15 @@
                         ])>
                             Mes ligues
                         </a>
+                        @if(auth()->user()->isAdmin)
+                            <a href="{{ route('admin') }}" @class([
+                                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors',
+                                'border-indigo-500 text-slate-900' => request()->routeIs('admin'),
+                                'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' => !request()->routeIs('admin'),
+                            ])>
+                                Admin
+                            </a>
+                        @endif
                     </div>
                 </div>
 
@@ -114,6 +123,9 @@
                 <a href="{{ route('matches') }}" class="block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-indigo-700">Matches</a>
                 <a href="{{ route('standings') }}" class="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700">Classements</a>
                 <a href="{{ route('leagues') }}" class="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700">Mes Ligues</a>
+                @if(auth()->user()->isAdmin)
+                    <a href="{{ route('admin') }}" class="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700">Admin</a>
+                @endif
             </div>
             @auth
                 <div class="border-t border-slate-200 pb-3 pt-4">

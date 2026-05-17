@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Middleware\EnsureUserIsAdmin;
+
 Route::get('/', function(){
     return view('welcome');
 })->name('home');
@@ -15,6 +17,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('leagues/create', 'leagues.create')->name('leagues.create');
     Route::livewire('leagues/{code}', 'leagues.private')->name('leagues.private');
     Route::livewire('profile', 'profile')->name('profile');
+
+    Route::livewire('admin', 'admin.index')->name('admin')->middleware(EnsureUserIsAdmin::class);
 });
 
 require __DIR__.'/settings.php';

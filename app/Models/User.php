@@ -79,4 +79,11 @@ class User extends Authenticatable
             get: fn() => $this->predictions()->sum('points'),
         );
     }
+
+    protected function isAdmin(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->role === 'admin',
+        );
+    }
 }

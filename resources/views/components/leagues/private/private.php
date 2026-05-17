@@ -130,6 +130,6 @@ new class extends Component
 
     public function updatedDescription(): void
     {
-        $this->league->update(['description' => $this->description]);
+        $this->league->update(['description' => $this->description ?? '']);
     }
 };
