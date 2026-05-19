@@ -61,11 +61,15 @@ new class extends Component
             ]
         );
 
+        
         $dataToUpdate = [
             'name' => $this->name,
             'email' => $this->email,
-            'winner_team_id' => $this->winner_team_id,
         ];
+
+        if(now()->isBefore($this->firstGame->kickoff_at)){
+            $dataToUpdate['winner_team_id'] = $this->winner_team_id;
+        }
 
         if ($this->photo) {
             $dataToUpdate['avatar_path'] = $this->photo->store('avatars', 'public');
