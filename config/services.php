@@ -44,4 +44,10 @@ return [
         'url' => env('API_URL', 'https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/odds'),
         'key' => env('ODDS_API_KEY', null),
     ],
+
+    'hcaptcha' => [
+        'sitekey' => env('HCAPTCHA_SITEKEY'),
+        'secret' => env('HCAPTCHA_SECRET'),
+        'verify_url' => env('HCAPTCHA_VERIFY_URL', "https://hcaptcha.com/siteverify"),
+    ],
 ];

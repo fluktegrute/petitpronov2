@@ -9,13 +9,13 @@
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.1.19/dist/trix.css">
-    <script type="text/javascript" src="https://unpkg.com/trix@2.1.19/dist/trix.umd.min.js"></script>
+    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 
     <link rel="icon" type="image/x-icon" href="{{ asset('storage/images/favicon.ico') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+
 </head>
 <body class="min-h-screen flex flex-col font-sans antialiased text-slate-900 selection:bg-indigo-500 selection:text-white">
     <main class="flex-grow py-10">
@@ -94,6 +94,17 @@
                                     </div>
                                     <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" placeholder="••••••••" class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium transition-all">
                                 </div>
+                            </div>
+
+                            <div class="flex flex-col items-center pt-2">
+                                <div class="h-captcha" data-sitekey="{{ config('services.hcaptcha.sitekey') }}"></div>
+                                
+                                @error('h-captcha-response')
+                                    <p class="mt-2 text-xs font-bold text-red-500 flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        {{ $message }}
+                                    </p>
+                                @enderror
                             </div>
 
                             <div class="pt-4">

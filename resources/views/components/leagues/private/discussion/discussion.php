@@ -8,6 +8,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Mews\Purifier\Facades\Purifier;
 
 new class extends Component
 {
@@ -43,16 +44,31 @@ new class extends Component
             ]
         );
 
+        if (strlen($this->body) > 20000) {
+            $this->addError('body', 'Message trop long.');
+            return;
+        }
+
         $formattedBody = preg_replace(
             '/<a[^>]*href="([^"]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^"]*)?)"[^>]*>.*?<\/a>/i',
             '<img src="$1" class="rounded-lg max-h-64 object-contain mt-2 mb-2" loading="lazy">',
             $this->body
         );
 
+        $config = [
+            'HTML.Allowed' => 'p,br,div,strong,em,del,s,a[href|title],img[src|alt|class|loading],ul,ol,li,blockquote,pre,code',
+            'URI.AllowedSchemes' => ['http' => true, 'https' => true],
+            'HTML.TargetBlank' => true,
+            'HTML.Nofollow' => true,
+        ];
+
+        $sanitized = Purifier::clean($formattedBody, $config);
+
+
         Message::create([
             'league_id' => $this->leagueId,
             'user_id' => auth()->id(),
-            'content' => $formattedBody,
+            'content' => $sanitized,
         ]);
 
         $this->body = '';
