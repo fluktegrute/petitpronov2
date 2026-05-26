@@ -5,6 +5,7 @@ use App\Models\Message;
 use Illuminate\Support\Collection;
 
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -12,6 +13,7 @@ new class extends Component
 {
     use WithFileUploads;
 
+    #[Locked]
     public int $leagueId;
     public string $body = '';
 

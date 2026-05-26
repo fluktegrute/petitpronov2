@@ -8,12 +8,15 @@ use Livewire\Attributes\Computed;
 use App\Models\League;
 use App\Models\LeagueUser;
 use App\Models\User;
+use Livewire\Attributes\Locked;
 
 new class extends Component
 {
     public League $league;
-    public bool $isUserAdmin = false;
     public string $description = '';
+
+    #[Locked]
+    public bool $isUserAdmin = false;
 
     public function mount(string $code)
     {
@@ -130,6 +133,7 @@ new class extends Component
 
     public function updatedDescription(): void
     {
-        $this->league->update(['description' => $this->description ?? '']);
+        if($this->isUserAdmin)
+            $this->league->update(['description' => $this->description ?? '']);
     }
 };
