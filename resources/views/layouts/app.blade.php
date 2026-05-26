@@ -71,7 +71,7 @@
                                 <span class="sr-only">Ouvrir le menu utilisateur</span>
                                 <div class="h-9 w-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
                                     @if(auth()->user()->avatar_path)
-                                        <img src="{{ asset('storage/'.auth()->user()->avatar_path) }}" class="w-full h-full object-cover">
+                                        <img src="{{ asset('storage/'.auth()->user()->avatar_path) }}" class="rounded-full w-full h-full object-cover">
                                     @else
                                         {{ auth()->user()->initials() }}
                                     @endif
@@ -132,7 +132,7 @@
                     <div class="flex items-center px-4">
                         <div class="h-10 w-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">
                             @if(auth()->user()->avatar_path)
-                                <img src="{{ asset('storage/'.auth()->user()->avatar_path) }}" class="w-full h-full object-cover">
+                                <img src="{{ asset('storage/'.auth()->user()->avatar_path) }}" class="rounded-full w-full h-full object-cover">
                             @else
                                 {{ auth()->user()->initials() }}
                             @endif
