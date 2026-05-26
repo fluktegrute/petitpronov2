@@ -20,14 +20,13 @@ use App\Models\Team;
 use App\Models\Prediction;
 use App\Models\User;
 
-use function PHPSTORM_META\map;
-
-#[Signature('matches:update')]
-#[Description('Met à jour les matches depuis l\'API football-data.org')]
+#[Description("Met à jour les matches depuis l'API football-data.org")]
 
 class UpdateMatches extends Command
 {
     use LogsWithTimestamps;
+
+    protected $signature = "matches:update {--fake : Simule l'appel API avec de faux résultats}";
 
     /**
      * Execute the console command.
@@ -35,6 +34,14 @@ class UpdateMatches extends Command
     public function handle(): void
     {
         $this->displayLogs("Starting update");
+
+        if($this->option('fake')) {
+            $this->displayLogs("Fake mode: API calls will be simulated.");
+
+            Http::fake([
+                config('services.football_data.url').'*' => Http::response($this->generateFakeResponse(), 200)
+            ]);
+        }
 
         $all_matches = ApiService::getEndpoint('matches');
 
@@ -384,6 +391,87 @@ class UpdateMatches extends Command
         }
 
         return null;
+    }
+
+    private function generateFakeResponse(): array
+    {
+        $gamesToSimulate = Game::where('kickoff_at', '>', now())->orderBy('kickoff_at')->take(2)->get();
+
+        $fakeMatches = [];
+
+        foreach ($gamesToSimulate as $game) {
+            $homeTeamScore = rand(0, 5);
+            $awayTeamScore = rand(0, 5);
+            $winner = match($homeTeamScore <=> $awayTeamScore){
+                -1  => "AWAY_TEAM",
+                0   => "DRAW",
+                1   => "HOME_TEAM",
+            };
+
+            $fakeMatches[] = [
+                "area" => [
+                    "id" => 2267,
+                    "name" => "World",
+                    "code" => "INT",
+                    "flag" => null,
+                ],
+                "competition" => [
+                    "id" => 2000,
+                    "name" => "FIFA World Cup",
+                    "code" => "WC",
+                    "type" => "CUP",
+                    "emblem" => "https://crests.football-data.org/wm26.png",
+                ],
+                "season" => [
+                    "id" => 2398,
+                    "startDate" => "2026-06-11",
+                    "endDate" => "2026-07-19",
+                    "currentMatchday" => 1,
+                    "winner" => null,
+                ],
+                "id" => $game->api_id,
+                "utcDate" => Carbon::parse($game->kickoff_at)->format("Y-m-d\TH:i:s\Z"),
+                "status" => "FINISHED",
+                "matchday" => $game->matchday,
+                "stage" => $game->stage,
+                "group" => $game->group,
+                "lastUpdated" => Carbon::parse($game->updated_at)->format("Y-m-d\TH:i:s\Z"),
+                "homeTeam" => [
+                    "id" => $game->homeTeam->api_id,
+                    "name" => $game->homeTeam->name,
+                    "shortName" => $game->homeTeam->name,
+                    "tla" => $game->homeTeam->code,
+                    "crest" => "https://crests.football-data.org/{$game->homeTeam->api_id}.svg",
+                ],
+                "awayTeam" => [
+                    "id" => $game->awayTeam->api_id,
+                    "name" => $game->awayTeam->name,
+                    "shortName" => $game->awayTeam->name,
+                    "tla" => $game->awayTeam->code,
+                    "crest" => "https://crests.football-data.org/{$game->awayTeam->api_id}.svg",
+                ],
+                "score" => [
+                    "winner" => $winner,
+                    "duration" => "REGULAR",
+                    "fullTime" => [
+                        "home" => $homeTeamScore,
+                        "away" => $awayTeamScore,
+                    ],
+                    "halfTime" => [
+                        "home" => floor($homeTeamScore / 2),
+                        "away" => floor($awayTeamScore / 2),
+                    ],
+                ],
+                "odds" => [
+                    "msg" => "Activate Odds-Package in User-Panel to retrieve odds.",
+                ],
+                "referees" => [],
+                ];
+        }
+
+        return [
+            'matches' => $fakeMatches
+        ];
     }
 
     private function getBracketAchors(): array 

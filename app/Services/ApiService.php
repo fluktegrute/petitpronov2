@@ -13,7 +13,7 @@ class ApiService {
         $apiKey = config('services.football_data.key');
 
         if($relatedToWC)
-            $apiUrl .= 'competitions/WC/';
+            $apiUrl .= 'competitions/WC';
 
         $response = Http::withHeaders(
                 [

@@ -45,6 +45,7 @@ class UpdateOdds extends Command
         foreach($oddsData as $matchOdds){
             $oddsHomeSlug = $this->normalizeTeamName($matchOdds['home_team']);
             $oddsAwaySlug = $this->normalizeTeamName($matchOdds['away_team']);
+
             $kickoff = Carbon::parse($matchOdds['commence_time'])->format('Y-m-d H:i:s');
 
             $averagedOdds = $this->calculateAverageOdds($matchOdds['bookmakers'], $matchOdds['home_team'], $matchOdds['away_team']);
@@ -54,28 +55,32 @@ class UpdateOdds extends Command
                 continue;
             }
 
-            $gamesAtThisTime = Game::with(['homeTeam', 'awayTeam'])
-                ->where('kickoff_at', $kickoff)
-                ->get();
+            $game = Game::with(['homeTeam', 'awayTeam'])
+                ->get()
+                ->first(function ($g) use ($oddsHomeSlug, $oddsAwaySlug, $kickoff) {
+                    if (!$g->homeTeam || !$g->awayTeam) 
+                        return false;
 
-            foreach ($gamesAtThisTime as $game) {
-                if (!$game->homeTeam || !$game->awayTeam) continue;
+                    $dbHomeSlug = $this->normalizeTeamName($g->homeTeam->name);
+                    $dbAwaySlug = $this->normalizeTeamName($g->awayTeam->name);
 
-                $dbHomeSlug = $this->normalizeTeamName($game->homeTeam->name);
-                $dbAwaySlug = $this->normalizeTeamName($game->awayTeam->name);
+                    $isSameTeams = ($oddsHomeSlug == $dbHomeSlug && $oddsAwaySlug == $dbAwaySlug);
 
-                if ($oddsHomeSlug === $dbHomeSlug && $oddsAwaySlug === $dbAwaySlug) {
-                    $game->update([
-                        'odds_home' => $averagedOdds['home'],
-                        'odds_draw' => $averagedOdds['draw'],
-                        'odds_away' => $averagedOdds['away'],
-                    ]);
-                    
-                    $this->displayLogs("Odds updated for {$game->homeTeam->name} vs {$game->awayTeam->name}");
-                    break;
-                }
-                else 
-                    $this->displayLogs("Unable to find a name correspondance between APIs for {$game->homeTeam->name} or {$game->awayTeam->name}", 'warn');
+                    $isSameTimeFrame = Carbon::parse($g->kickoff_at)->diffInHours($kickoff) < 24;
+
+                    return $isSameTeams && $isSameTimeFrame;
+                });
+
+            if ($game) {
+                $game->update([
+                    'odds_home' => $averagedOdds['home'],
+                    'odds_draw' => $averagedOdds['draw'],
+                    'odds_away' => $averagedOdds['away'],
+                ]);
+                
+                $this->displayLogs("Odds updated for {$game->homeTeam->name} vs {$game->awayTeam->name}");
+            } else {
+                $this->displayLogs("Unable to find a DB match for API Odds: {$matchOdds['home_team']} vs {$matchOdds['away_team']}", 'warn');
             }
         }
         
