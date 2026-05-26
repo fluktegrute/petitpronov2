@@ -8,6 +8,7 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rule;
 
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -17,6 +18,7 @@ new class extends Component
 
     public string $name = '';
     public string $email = '';
+    #[Locked]
     public int $userId;
     public ?int $winner_team_id = null;
     public string $current_password = '';
