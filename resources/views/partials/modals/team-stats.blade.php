@@ -23,7 +23,7 @@
             
             <div 
                 x-show="statsModalOpen"
-                @click.away="statsModalOpen = false"
+                @click.outside="statsModalOpen = false"
                 @keydown.escape.window="statsModalOpen = false"
                 x-transition:enter="ease-out duration-300"
                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
@@ -49,9 +49,9 @@
                             <span>l'équipe</span>
                         @endif
                     </h3>
-                    <button @click="statsModalOpen = false" type="button" class="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1 rounded-lg transition-colors">
+                    <button @click="statsModalOpen = false" type="button" class="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1 rounded-lg transition-colors cursor-pointer touch-manipulation">
                         <span class="sr-only">Fermer</span>
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                        <svg class="h-6 w-6 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
 

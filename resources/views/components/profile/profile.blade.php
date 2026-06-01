@@ -28,8 +28,8 @@
                 <p class="text-sm font-semibold text-gray-800">{{ session('status') }}</p>
             </div>
 
-            <button @click="show = false" class="flex-shrink-0 text-gray-400 transition-colors hover:text-gray-600 focus:outline-none">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <button @click="show = false" class="flex-shrink-0 text-gray-400 transition-colors hover:text-gray-600 focus:outline-none cursor-pointer touch-manipulation">
+                <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>

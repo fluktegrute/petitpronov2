@@ -15,14 +15,14 @@
 
     <div class="flex justify-center">
         <div class="bg-slate-200/50 p-1 rounded-xl inline-flex gap-1 shadow-inner">
-            <button 
-                class="px-6 py-2 rounded-lg transition-all text-sm {{ $tab == "upcoming" ? "bg-white text-indigo-700 font-bold shadow-sm" : "text-slate-500 font-medium hover:text-slate-700 hover:bg-slate-200" }}" 
+            <button
+                class="px-6 py-2 rounded-lg transition-all text-sm cursor-pointer touch-manipulation {{ $tab == "upcoming" ? "bg-white text-indigo-700 font-bold shadow-sm" : "text-slate-500 font-medium hover:text-slate-700 hover:bg-slate-200" }}"
                 wire:click="$set('tab', 'upcoming')"
             >
                 À venir
             </button>
-            <button 
-                class="px-6 py-2 rounded-lg transition-all text-sm {{ $tab == "upcoming" ? "text-slate-500 font-medium hover:text-slate-700 hover:bg-slate-200" : "bg-white text-indigo-700 font-bold shadow-sm" }}" 
+            <button
+                class="px-6 py-2 rounded-lg transition-all text-sm cursor-pointer touch-manipulation {{ $tab == "upcoming" ? "text-slate-500 font-medium hover:text-slate-700 hover:bg-slate-200" : "bg-white text-indigo-700 font-bold shadow-sm" }}"
                 wire:click="$set('tab', 'past')"
             >
                 Passés
@@ -63,8 +63,8 @@
                             <img src="{{ asset($game->homeTeam->flag_path) }}" alt="{{ $game->homeTeam->name }}" class="h-9 sm:h-12 object-cover rounded shadow-sm border border-slate-100">
                             <div class="flex gap-1">
                                 <span class="font-bold text-slate-900 text-center leading-tight">{{ $game->homeTeam->nameFr }}</span>
-                                <span class="text-indigo-600 cursor-pointer" wire:click="openStatsModal({{ $game->homeTeam->id }})">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                <span class="text-indigo-600 cursor-pointer touch-manipulation" wire:click="openStatsModal({{ $game->homeTeam->id }})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pointer-events-none">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                                     </svg>
                                 </span>
@@ -84,8 +84,8 @@
                         <div class="flex flex-col items-center gap-4 w-1/3">
                             @if($tab === 'upcoming')
                                 <span class="text-slate-400 font-black italic text-lg">VS</span>
-                                <button class="text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1" wire:click="openH2hModal({{ $game->id }})">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <button class="text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer touch-manipulation" wire:click="openH2hModal({{ $game->id }})">
+                                    <svg class="w-3.5 h-3.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                                     </svg>
                                     Stats H2H
@@ -104,8 +104,8 @@
                             <img src="{{ asset($game->awayTeam->flag_path) }}" alt="{{ $game->awayTeam->name }}" class="h-9 sm:h-12 object-cover rounded shadow-sm border border-slate-100">
                             <div class="flex gap-1">
                                 <span class="font-bold text-slate-900 text-center leading-tight">{{ $game->awayTeam->nameFr }}</span>
-                                <span class="text-indigo-600 cursor-pointer" wire:click="openStatsModal({{ $game->awayTeam->id }})">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                <span class="text-indigo-600 cursor-pointer touch-manipulation" wire:click="openStatsModal({{ $game->awayTeam->id }})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pointer-events-none">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                                     </svg>
                                 </span>

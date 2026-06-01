@@ -37,8 +37,8 @@
                 <p class="text-sm font-semibold text-gray-800">{{ session('error') }}</p>
             </div>
 
-            <button @click="show = false" class="flex-shrink-0 text-gray-400 transition-colors hover:text-gray-600 focus:outline-none">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <button @click="show = false" class="flex-shrink-0 text-gray-400 transition-colors hover:text-gray-600 focus:outline-none cursor-pointer touch-manipulation">
+                <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
@@ -60,7 +60,7 @@
                 <div class="flex flex-col gap-2">
                     <div class="flex w-full sm:w-auto gap-2">
                         <input type="text" wire:model="joinCode" placeholder="Ex: P0N3Y26" class="w-full sm:w-32 bg-slate-50 border border-slate-200 text-slate-800 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 uppercase">
-                        <button wire:click="joinLeague" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors">
+                        <button wire:click="joinLeague" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer touch-manipulation">
                             Go
                         </button>
                     </div>
