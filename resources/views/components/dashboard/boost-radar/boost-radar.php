@@ -19,7 +19,7 @@ new class extends Component
             ->where('kickoff_at', '>', now())
             ->whereNotNull('odds_home')
             ->whereNotNull('odds_away')
-            ->orderByRaw('GREATEST(odds_home, odds_away) DESC')
+            ->orderByRaw('CASE WHEN odds_home > odds_away THEN odds_home ELSE odds_away END DESC')
             ->first();
 
         if (!$game || !$game->homeTeam || !$game->awayTeam) {

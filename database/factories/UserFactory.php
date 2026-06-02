@@ -33,6 +33,13 @@ class UserFactory extends Factory
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
+            // Columns with DB defaults that must be set on the in-memory model
+            'role' => 'user',
+            'total_points' => 0,
+            'exact_count' => 0,
+            'trend_count' => 0,
+            'prono_count' => 0,
+            'boosts_remaining' => config('app.initial_booster_quantity', 3),
         ];
     }
 
@@ -44,6 +51,11 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn () => ['role' => 'admin']);
     }
 
     /**
