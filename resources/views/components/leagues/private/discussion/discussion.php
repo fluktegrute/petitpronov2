@@ -55,15 +55,7 @@ new class extends Component
             $this->body
         );
 
-        $config = [
-            'HTML.Allowed' => 'p,br,div,strong,em,del,s,a[href|title],img[src|alt|class|loading],ul,ol,li,blockquote,pre,code',
-            'URI.AllowedSchemes' => ['http' => true, 'https' => true],
-            'HTML.TargetBlank' => true,
-            'HTML.Nofollow' => true,
-        ];
-
-        $sanitized = Purifier::clean($formattedBody, $config);
-
+        $sanitized = Purifier::clean($formattedBody, 'ponybet');
 
         Message::create([
             'league_id' => $this->leagueId,

@@ -37,6 +37,14 @@ return [
             "HTML.SafeIframe"      => 'true',
             "URI.SafeIframeRegexp" => "%^(http://|https://|//)(www.youtube.com/embed/|player.vimeo.com/video/)%",
         ],
+        'ponybet' => [
+            'HTML.Allowed'       => 'p,br,div,strong,em,del,s,a[href|title],img[src|alt|class|loading],ul,ol,li,blockquote,pre,code',
+            'URI.AllowedSchemes' => ['http' => true, 'https' => true],
+            'HTML.TargetBlank'   => true,
+            'HTML.Nofollow'      => true,
+            'HTML.DefinitionID'  => 'html5-definitions',
+            'HTML.DefinitionRev' => 1,
+        ],
         'custom_definition' => [
             'id'  => 'html5-definitions',
             'rev' => 1,
@@ -93,6 +101,7 @@ return [
                 ['tr', 'width', 'Text'],
                 ['tr', 'height', 'Text'],
                 ['tr', 'border', 'Text'],
+                ['img', 'loading', 'Enum#lazy,eager'],
             ],
         ],
         'custom_attributes' => [
@@ -102,5 +111,4 @@ return [
             ['u', 'Inline', 'Inline', 'Common'],
         ],
     ],
-
 ];
