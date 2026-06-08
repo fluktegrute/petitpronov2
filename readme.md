@@ -1,23 +1,25 @@
 ## À propos de Petit Prono
 
-Petit Prono est un outil qui permet de jouer à faire des pronos sur la Coupe du Monde de football 2026.<br><br>
+Petit Prono est un outil de pronostics pour la Coupe du Monde de football 2026, pensé pour jouer entre amis ou collègues.<br><br>
 L'idée vient de "Mon Petit Gazon" (props to them) qui avait lancé une appli du même genre pour le Mondial 2018 mais, entre temps, celle-ci est devenue une usine à gaz et a perdu de sa simplicité/convivialité (AMHA).<br><br>
-J'ai donc recréé une sorte de "Mon Petit Prono" tel qu'il était (à peu près) à l'époque, histoire d'y rejouer avec des collègues.<br>
+J'ai donc recréé une sorte de "Mon Petit Prono" tel qu'il était (à peu près) à l'époque, histoire d'y rejouer avec des collègues.
 
 ## Bases techniques
 
-L'application est basée sur la stack TALL (Laravel v13, Livewire v4, TailwindCSS, Alpine.js), une base de donnée relationnelle est nécessaire pour la faire fonctionner.<br>
-Des API tierces sont utilisées : 
+L'application est basée sur la stack TALL (Laravel v13, Livewire v4, TailwindCSS, Alpine.js) avec le composant UI [Flux](https://fluxui.dev/). Une base de données relationnelle est nécessaire pour la faire fonctionner.<br>
+Des API tierces sont utilisées :
 - **[Football Data](https://www.football-data.org/)** pour les résultats et le calendrier des matches
 - **[The Odds API](https://the-odds-api.com/)** pour les cotes
+- **[hCaptcha](https://www.hcaptcha.com/)** pour la protection du formulaire d'inscription
 
 ## Prérequis
 
 - PHP 8.2+
-- Composer 
+- Composer
 - Node.js & NPM
 - Une clé API chez Football-Data (le plan gratuit est suffisant)
 - Une clé API chez The Odds API (le plan gratuit est suffisant)
+- Un couple sitekey / secret chez hCaptcha (le plan gratuit est suffisant)
 
 ## Installation
 
@@ -36,6 +38,8 @@ php artisan key:generate
 ```
 API_KEY=votre_clé_football_data
 ODDS_API_KEY=votre_clé_the_odds_api
+HCAPTCHA_SITEKEY=votre_sitekey_hcaptcha
+HCAPTCHA_SECRET=votre_secret_hcaptcha
 APP_TIMEZONE="Europe/Paris"
 ```
 - Lancer les migrations et lier le stockage
@@ -47,39 +51,58 @@ php artisan storage:link
 ## Fonctionnement
 
 ### Jeu de base
-Chaque joueur peut pronostiquer le résultat d'un match et choisir de jouer un de ses boosters sur ce match. <br>
-Il ne peut le faire qu'avant le début du match (une tentative de création/modification de prono après le début du match associé entraine une pénalité pour tentatvie de tricherie).<br><br>
-Si son prono est bon, il gagne des points en fonction du résultat du match et de la cote, sinon il ne gagne pas de points.<br>
-S'il a joué un booster, son score pour le match est multiplié par le multiplicateur.<br><br>
-Les joueurs peuvent également pronostiquer le vainqueur final, pour un bonus de points supplémentaires en fin de tournoi. Le vainqueur final ne peut être choisi qu'une fois, et avant le debut du premier match.<br>
+Chaque joueur peut pronostiquer le score exact d'un match et choisir d'y jouer un de ses boosters.<br>
+Les pronostics ne sont modifiables qu'avant le coup d'envoi : toute tentative de création ou modification après le début du match est détectée et entraîne une pénalité pour tentative de triche.<br><br>
+Si le prono est exact (score parfait), le joueur gagne davantage de points. S'il a pronostiqué la bonne tendance (victoire, nul ou défaite), il gagne des points. Sinon, il n'en gagne pas.<br>
+Les points attribués tiennent compte des cotes du match si elles sont disponibles.<br>
+Si le joueur a activé un booster sur ce match, son score est multiplié par le multiplicateur configuré.
+
+### Poney (vainqueur final)
+Chaque joueur peut désigner son "poney", c'est-à-dire l'équipe qu'il pense vainqueur du tournoi.<br>
+Ce choix n'est possible qu'avant le début du premier match et ne peut être fait qu'une seule fois.<br>
+Si l'équipe choisie remporte le tournoi, le joueur reçoit un bonus de points en fin de compétition.
+
+### Boosters
+Chaque joueur dispose d'un nombre limité de boosters (3 par défaut). Jouer un booster sur un match multiplie le score obtenu pour ce match par le multiplicateur configuré (×2 par défaut). Les boosters non utilisés sont perdus en fin de tournoi.
 
 ### Ligues
-Par défaut, chaque joueur fait partie du "classement général" qui regroupe tous les joueurs inscrits.<br><br>
-Un joueur peut créer des ligues qui vont regrouper les joueurs qui les rejoignent. Le score d'un joueur dans une ligue est le même que dans le classement général, seuls les "adversaires" sont limités aux participants de la ligue.<br><br>
-Pour rejoindre une ligue, il suffit de renseigner le code qui a été fourni au créateur de la ligue au moment de sa création.<br>
+Par défaut, chaque joueur fait partie du "classement général" qui regroupe tous les inscrits.<br><br>
+Un joueur peut créer des ligues privées pour n'affronter qu'un groupe restreint. Le score dans une ligue est identique au score global : seul le périmètre des adversaires change.<br><br>
+Pour rejoindre une ligue, il suffit de saisir le code d'invitation fourni au créateur lors de la création. Chaque ligue dispose d'un espace de discussion (messagerie) réservé à ses membres.
+
+### Classements et statistiques
+- **Classement général** : toutes les équipes triées selon les règles FIFA (points, différence de buts, buts marqués, résultats directs)
+- **Bracket de phase finale** : visualisation du tableau des 16 équipes qualifiées jusqu'à la finale
+- **Statistiques H2H** : historique des confrontations directes entre deux équipes, consultable depuis la page des matches
+- **Tableau de bord** : récapitulatif personnel — mes stats (total de points, pronos exacts, pronos gagnants), prochains matches à pronostiquer, classement des joueurs dans mes ligues, derniers résultats, mon poney et mes boosters restants
+
+### Profil utilisateur
+Chaque joueur peut gérer son profil : photo de profil (avatar), mot de passe, authentification à deux facteurs (2FA), vérification d'e-mail et suppression de compte.
+
+### Administration
+Un panneau d'administration (accessible aux comptes avec le rôle `admin`) permet de gérer les données de l'application.
 
 ### Actualisations
 Il existe plusieurs commandes Artisan permettant de mettre à jour l'appli :
-- `php artisan matches:update` : pour actualiser les matches, les équipes et leur classement en poule, ainsi que les points des joueurs
-- `php artisan odds:update` : pour actualiser les cotes des matches
-- `php artisan h2h:import` : pour importer l'historique des matches (permet d'afficher les H2H et l'historique récent des Nations)
+- `php artisan matches:update` : actualise les matches, les équipes et leur classement en poule, et recalcule les points de tous les joueurs
+- `php artisan odds:update` : actualise les cotes des matches (moyennées sur plusieurs bookmakers)
+- `php artisan h2h:import` : importe l'historique des confrontations directes depuis un fichier CSV (option `--dateFrom=YYYY-MM-DD` pour filtrer par date)
+
+Ces commandes sont conçues pour être planifiées (cron) afin que l'appli reste à jour automatiquement.
 
 ## Personnalisation
 
-Les paramètres suivants sont personnalisables : 
-- Fuseau horaire des matches (variable d'environnement **APP_TIMEZONE**), par défaut Europe/Paris
-- Nombre de points gagnés par les joueurs
-    - pour un score exact (variable d'environnement **EXACT_SCORE_POINTS**), par défaut 30
-    - pour un prono gagné (variable d'environnement **WINNING_PRONO_POINTS**), par défaut 10
-    - pour le vainqueur final (variable d'environnement **WINNER_PRONO_POINTS**), par défaut 50
-    - pour le multiplicateur des boosters (variable d'environnement **BOOSTER_MULTIPLIER**), par défaut 2
-    - pour une tentative de tricherie (points perdus pour le coup) (variable d'environnement **CHEATING_POINTS_TO_REMOVE**), par défaut 15
-- Nombre de boosters disponibles par joueur (variable d'environnement **INITIAL_BOOSTER_QUANTITY**), par défaut 3
+Les paramètres suivants sont personnalisables via des variables d'environnement :
 
-## TODO
-- Update des points dans README (avec les cotes)
-- Screenshots du README
-- Intégration hCaptcha
+| Variable | Défaut | Description |
+|---|---|---|
+| `APP_TIMEZONE` | `Europe/Paris` | Fuseau horaire d'affichage des matches |
+| `EXACT_SCORE_POINTS` | `30` | Points pour un score exact |
+| `WINNING_PRONO_POINTS` | `10` | Points pour une bonne tendance |
+| `WINNER_PRONO_POINTS` | `50` | Bonus de points pour le vainqueur final |
+| `BOOSTER_MULTIPLIER` | `2` | Multiplicateur appliqué par un booster |
+| `INITIAL_BOOSTER_QUANTITY` | `3` | Nombre de boosters par joueur |
+| `CHEATING_POINTS_TO_REMOVE` | `15` | Points retirés pour tentative de triche |
 
 ## Licence
 
