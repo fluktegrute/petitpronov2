@@ -196,6 +196,63 @@
                         </div>
                     </div>
                 @endif
+
+                @if($gameIsStarted)
+                    @php $otherPronos = $this->otherPredictionsByGame[$game->id] ?? []; @endphp
+                    @if(count($otherPronos) > 0)
+                        <div x-data="{ open: false }" class="border-t border-slate-100">
+                            <button
+                                x-on:click="open = !open"
+                                class="w-full px-6 py-3 flex items-center justify-between text-sm text-slate-500 hover:bg-slate-50 transition-colors cursor-pointer"
+                            >
+                                <span class="font-medium flex items-center gap-1.5">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    Pronos des joueurs de mes ligues
+                                    <span class="bg-slate-200 text-slate-600 text-xs font-bold px-1.5 py-0.5 rounded-full">{{ count($otherPronos) }}</span>
+                                </span>
+                                <svg x-bind:class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div x-show="open" x-transition class="divide-y divide-slate-50 pb-2">
+                                @foreach($otherPronos as $p)
+                                    @php
+                                        $pStatus  = $p['status'] ?? null;
+                                        $pPoints  = $p['points'] ?? 0;
+                                        $pBoosted = $p['is_boosted'] ?? false;
+                                        $pDone    = in_array($pStatus, ['exact', 'trend', 'lost']);
+                                    @endphp
+                                    <div class="px-6 py-2.5 flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            @if($p['user']['avatar_path'])
+                                                <img src="{{ asset($p['user']['avatar_path']) }}" class="w-7 h-7 rounded-full object-cover flex-shrink-0 border border-slate-100">
+                                            @else
+                                                <div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                                                    {{ strtoupper(mb_substr($p['user']['name'], 0, 1)) }}
+                                                </div>
+                                            @endif
+                                            <span class="font-medium text-sm text-slate-700 truncate">{{ $p['user']['name'] }}</span>
+                                            @if($pBoosted)
+                                                <span title="Booster utilisé">🚀</span>
+                                            @endif
+                                        </div>
+                                        <div class="flex items-center gap-2 flex-shrink-0">
+                                            <span class="font-black text-slate-800 text-sm tabular-nums">{{ $p['home_score'] }} - {{ $p['away_score'] }}</span>
+                                            @if($pDone)
+                                                @if($pStatus === 'exact')
+                                                    <span title="Score exact">🎯</span>
+                                                @elseif($pStatus === 'trend')
+                                                    <span title="Bonne tendance">📈</span>
+                                                @else
+                                                    <span title="Raté">❌</span>
+                                                @endif
+                                                <span class="font-black text-sm w-10 text-right {{ $pPoints > 0 ? 'text-emerald-600' : 'text-slate-400' }}">+{{ $pPoints }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                @endif
             </div>
         @empty
             <div class="text-center py-10 bg-white rounded-2xl border border-slate-200 border-dashed">

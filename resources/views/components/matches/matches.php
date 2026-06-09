@@ -78,7 +78,43 @@ new class extends Component
     }
 
     #[Computed]
-    public function currentStatsTeam(): ?Team 
+    public function otherPredictionsByGame(): array
+    {
+        $leagueMateIds = auth()->user()
+            ->leagues()
+            ->with('users:id')
+            ->get()
+            ->flatMap(fn($league) => $league->users->pluck('id'))
+            ->unique()
+            ->reject(fn($id) => $id === auth()->id())
+            ->values();
+
+        if ($leagueMateIds->isEmpty()) {
+            return [];
+        }
+
+        $startedGameIds = $this->games
+            ->filter(fn($game) => now()->isAfter($game->kickoff_at))
+            ->pluck('id');
+
+        if ($startedGameIds->isEmpty()) {
+            return [];
+        }
+
+        return Prediction::with('user:id,name,avatar_path')
+            ->whereIn('user_id', $leagueMateIds)
+            ->whereIn('game_id', $startedGameIds)
+            ->where('status', '!=', 'cheated')
+            ->whereNotNull('home_score')
+            ->whereNotNull('away_score')
+            ->get()
+            ->groupBy('game_id')
+            ->map(fn($preds) => $preds->sortByDesc('points')->values())
+            ->toArray();
+    }
+
+    #[Computed]
+    public function currentStatsTeam(): ?Team
     {
         if (!$this->currentStatsTeamId) {
             return null;
