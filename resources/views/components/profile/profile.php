@@ -26,6 +26,8 @@ new class extends Component
     public string $new_password_confirmation = '';
     public Game $firstGame;
     public $photo;
+    public bool $notify_match_reminder = false;
+    public bool $notify_daily_recap = false;
 
     public function mount()
     {
@@ -35,6 +37,8 @@ new class extends Component
         $this->userId = $user->id;
         $this->winner_team_id = $user->winner_team_id;
         $this->firstGame = Game::orderBy('kickoff_at')->first();
+        $this->notify_match_reminder = (bool) $user->notify_match_reminder;
+        $this->notify_daily_recap    = (bool) $user->notify_daily_recap;
     }
 
     public function updateProfile()
@@ -96,6 +100,16 @@ new class extends Component
         $this->reset(['current_password', 'new_password', 'new_password_confirmation']);
 
         session()->flash('status', 'Mot de passe modifié avec succès.');
+    }
+
+    public function updateNotifications(): void
+    {
+        auth()->user()->update([
+            'notify_match_reminder' => $this->notify_match_reminder,
+            'notify_daily_recap'    => $this->notify_daily_recap,
+        ]);
+
+        session()->flash('status', 'Préférences de notifications mises à jour.');
     }
 
     #[Computed]

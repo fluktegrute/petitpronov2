@@ -206,5 +206,57 @@
             </form>
         </section>
 
+        {{-- Notifications --}}
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-6 sm:p-8 border-b border-slate-100">
+                <h2 class="text-xl font-bold text-slate-900">Notifications par e-mail</h2>
+                <p class="text-sm text-slate-500">Reçois des e-mails automatiques pour ne rien rater.</p>
+            </div>
+
+            <form wire:submit="updateNotifications" class="p-6 sm:p-8 space-y-5">
+
+                <label class="flex items-start gap-4 cursor-pointer group">
+                    <div class="relative mt-0.5 shrink-0">
+                        <input type="checkbox" wire:model="notify_match_reminder" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200 peer-focus:ring-2 peer-focus:ring-indigo-400 peer-focus:ring-offset-1"></div>
+                        <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-5"></div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-slate-800 group-hover:text-indigo-700 transition-colors">
+                            Rappel avant les matchs
+                        </p>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Reçois un e-mail ~12h avant chaque match pour lequel tu n'as pas encore posé de prono.
+                        </p>
+                    </div>
+                </label>
+
+                <div class="border-t border-slate-100"></div>
+
+                <label class="flex items-start gap-4 cursor-pointer group">
+                    <div class="relative mt-0.5 shrink-0">
+                        <input type="checkbox" wire:model="notify_daily_recap" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200 peer-focus:ring-2 peer-focus:ring-indigo-400 peer-focus:ring-offset-1"></div>
+                        <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-5"></div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-slate-800 group-hover:text-indigo-700 transition-colors">
+                            Récapitulatif quotidien
+                        </p>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Reçois chaque soir un e-mail avec les résultats du jour, tes points gagnés et ton classement.
+                        </p>
+                    </div>
+                </label>
+
+                <div class="flex justify-end pt-2">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-xl font-bold shadow-md shadow-indigo-200 transition-all flex items-center gap-2">
+                        <span wire:loading wire:target="updateNotifications" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </section>
+
     </div>
 </div>

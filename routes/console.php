@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// Rappel 12h avant les matchs sans prono (toutes les heures)
+Schedule::command('notifications:match-reminders')->hourly();
+
+// Récap quotidien des résultats + classement (chaque soir à 22h)
+Schedule::command('notifications:daily-recap')->dailyAt('22:00');
