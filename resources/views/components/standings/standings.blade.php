@@ -52,6 +52,8 @@
                                     <th scope="col" class="px-2 py-3 text-center hidden sm:table-cell" title="Gagnés">G</th>
                                     <th scope="col" class="px-2 py-3 text-center hidden sm:table-cell" title="Nuls">N</th>
                                     <th scope="col" class="px-2 py-3 text-center hidden sm:table-cell" title="Perdus">P</th>
+                                    <th scope="col" class="px-2 py-3 text-center hidden sm:table-cell" title="Buts pour">BP</th>
+                                    <th scope="col" class="px-2 py-3 text-center hidden sm:table-cell" title="Buts contre">BC</th>
                                     <th scope="col" class="px-2 py-3 text-center" title="Différence de buts">Diff</th>
                                     <th scope="col" class="px-4 py-3 text-center text-indigo-900">Pts</th>
                                 </tr>
@@ -85,12 +87,20 @@
                                         <td class="px-2 py-3 text-center text-slate-500 hidden sm:table-cell">{{ $team->won ?? 0 }}</td>
                                         <td class="px-2 py-3 text-center text-slate-500 hidden sm:table-cell">{{ $team->drawn ?? 0 }}</td>
                                         <td class="px-2 py-3 text-center text-slate-500 hidden sm:table-cell">{{ $team->lost ?? 0 }}</td>
-                                        
+
+                                        <td class="px-2 py-3 text-center font-semibold hidden sm:table-cell">
+                                            <span class="text-slate-400">{{ $team->goals_for }}</span>
+                                        </td>
+
+                                        <td class="px-2 py-3 text-center font-semibold hidden sm:table-cell">
+                                            <span class="text-slate-400">{{ $team->goals_against }}</span>
+                                        </td>
+
                                         <td class="px-2 py-3 text-center font-semibold">
-                                            @if(($team->goal_difference ?? 0) > 0)
-                                                <span class="text-emerald-600">+{{ $team->goal_difference }}</span>
-                                            @elseif(($team->goal_difference ?? 0) < 0)
-                                                <span class="text-red-500">{{ $team->goal_difference }}</span>
+                                            @if(($team->goal_diff ?? 0) > 0)
+                                                <span class="text-emerald-600">+{{ $team->goal_diff }}</span>
+                                            @elseif(($team->goal_diff ?? 0) < 0)
+                                                <span class="text-red-500">{{ $team->goal_diff }}</span>
                                             @else
                                                 <span class="text-slate-400">0</span>
                                             @endif

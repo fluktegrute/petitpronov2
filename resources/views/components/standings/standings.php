@@ -17,7 +17,6 @@ new class extends Component
     {
         return Team::whereNotNull('pool')
             ->orderBy('pool', 'ASC')
-            ->orderBy('position', 'DESC')
             ->orderBy('points', 'DESC')
             ->orderBy('goal_diff', 'DESC')
             ->orderBy('goals_for', 'DESC')

@@ -7,6 +7,8 @@
             @livewire('dashboard.last-results')
             @livewire('dashboard.my-pony')
             @livewire('dashboard.boost-radar')
+            @livewire('dashboard.score-progression')
+            @livewire('dashboard.best-prono')
         </div>
     </div>
 </x-layouts::app>
