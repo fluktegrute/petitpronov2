@@ -77,7 +77,12 @@ Pour rejoindre une ligue, il suffit de saisir le code d'invitation fourni au cr�
 - **Tableau de bord** : récapitulatif personnel — mes stats (total de points, pronos exacts, pronos gagnants), prochains matches à pronostiquer, classement des joueurs dans mes ligues, derniers résultats, mon poney et mes boosters restants
 
 ### Profil utilisateur
-Chaque joueur peut gérer son profil : photo de profil (avatar), mot de passe, authentification à deux facteurs (2FA), vérification d'e-mail et suppression de compte.
+Chaque joueur peut gérer son profil : pseudo, photo de profil, mot de passe.
+
+### Notifications
+Les joueurs peuvent activer des notifications par e-mail : 
+- Récapitulatif des matches du jour (scores, résultat des pronos, points gagnés, classement etc)
+- Matches imminents pour lesquels ils n'ont pas encore enregistré de pronos
 
 ### Administration
 Un panneau d'administration (accessible aux comptes avec le rôle `admin`) permet de gérer les données de l'application.
