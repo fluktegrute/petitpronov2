@@ -223,7 +223,7 @@
                                     <div class="px-6 py-2.5 flex items-center justify-between gap-3">
                                         <div class="flex items-center gap-2.5 min-w-0">
                                             @if($p['user']['avatar_path'])
-                                                <img src="{{ asset($p['user']['avatar_path']) }}" class="w-7 h-7 rounded-full object-cover flex-shrink-0 border border-slate-100">
+                                                <img src="{{ asset('storage/'.$p['user']['avatar_path']) }}" class="w-7 h-7 rounded-full object-cover flex-shrink-0 border border-slate-100">
                                             @else
                                                 <div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
                                                     {{ strtoupper(mb_substr($p['user']['name'], 0, 1)) }}
