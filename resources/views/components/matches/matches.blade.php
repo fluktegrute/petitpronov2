@@ -49,7 +49,7 @@
                 <div class="bg-slate-50 px-4 py-3 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-2 text-sm">
                     <div class="flex items-center gap-2 text-slate-500 font-medium">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        {{ $game->formattedDate }}
+                        {{ ucfirst($game->kickoff_at->translatedFormat('l d F Y \à H\hi')) }}
                     </div>
                     <div class="font-semibold text-slate-700 bg-slate-200/50 px-3 py-1 rounded-full text-xs">
                         {{ $game->stageFr }}{{ $game->stage == "GROUP_STAGE" ? " • {$game->groupFr}" : "" }}

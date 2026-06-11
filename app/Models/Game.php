@@ -16,7 +16,7 @@ class Game extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'kickoff_at' => 'datetime:UTC', 
+        'kickoff_at' => 'datetime',
     ];
 
     public function homeTeam(): BelongsTo
@@ -55,10 +55,10 @@ class Game extends Model
         );
     }
 
-    protected function formattedDate(): Attribute 
+    protected function kickoffAt(): Attribute
     {
         return Attribute::make(
-            get: fn () => ucfirst(Carbon::parse($this->kickoff_at)->timezone(config('app.timezone'))->translatedFormat('l d F Y \à H\hi'))
+            get: fn ($value) => $value ? Carbon::parse($value, 'UTC')->setTimezone(config('app.timezone')) : null,
         );
     }
 }

@@ -64,7 +64,7 @@
                                             </tr>
                                         </table>
                                         <p style="margin:8px 0 0;font-size:12px;color:#9ca3af;text-align:center;">
-                                            🕐 {{ $game->formattedDate }}
+                                            🕐 {{ ucfirst($game->kickoff_at->translatedFormat('l d F Y \à H\hi')) }}
                                         </p>
                                     </td>
                                 </tr>
