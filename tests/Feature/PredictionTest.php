@@ -7,7 +7,7 @@ use Livewire\Livewire;
 
 test('setting a score creates a new prediction', function () {
     $user = User::factory()->create();
-    $game = Game::factory()->create(['kickoff_at' => now()->addHours(2)]);
+    $game = Game::factory()->create(['kickoff_at' => now()->utc()->addHours(2)]);
 
     $this->actingAs($user);
 
@@ -20,7 +20,7 @@ test('setting a score creates a new prediction', function () {
 
 test('updating a score updates the existing prediction', function () {
     $user = User::factory()->create();
-    $game = Game::factory()->create(['kickoff_at' => now()->addHours(2)]);
+    $game = Game::factory()->create(['kickoff_at' => now()->utc()->addHours(2)]);
     Prediction::factory()->withScores(1, 0)->create(['user_id' => $user->id, 'game_id' => $game->id]);
 
     $this->actingAs($user);
@@ -37,7 +37,7 @@ test('updating a score updates the existing prediction', function () {
 
 test('setting a score after kickoff marks prediction as cheated', function () {
     $user = User::factory()->create();
-    $game = Game::factory()->create(['kickoff_at' => now()->subMinutes(5)]);
+    $game = Game::factory()->create(['kickoff_at' => now()->utc()->subMinutes(5)]);
 
     $this->actingAs($user);
 
@@ -51,7 +51,7 @@ test('setting a score after kickoff marks prediction as cheated', function () {
 
 test('applying a boost creates prediction with is_boosted true and decrements user boosts', function () {
     $user = User::factory()->create(['boosts_remaining' => 3]);
-    $game = Game::factory()->create(['kickoff_at' => now()->addHours(2)]);
+    $game = Game::factory()->create(['kickoff_at' => now()->utc()->addHours(2)]);
 
     $this->actingAs($user);
 
@@ -67,7 +67,7 @@ test('applying a boost creates prediction with is_boosted true and decrements us
 
 test('cannot apply boost when no boosts remaining', function () {
     $user = User::factory()->create(['boosts_remaining' => 0]);
-    $game = Game::factory()->create(['kickoff_at' => now()->addHours(2)]);
+    $game = Game::factory()->create(['kickoff_at' => now()->utc()->addHours(2)]);
 
     $this->actingAs($user);
 
@@ -83,7 +83,7 @@ test('cannot apply boost when no boosts remaining', function () {
 
 test('removing a boost returns it to the user', function () {
     $user = User::factory()->create(['boosts_remaining' => 2]);
-    $game = Game::factory()->create(['kickoff_at' => now()->addHours(2)]);
+    $game = Game::factory()->create(['kickoff_at' => now()->utc()->addHours(2)]);
     Prediction::factory()->withScores(1, 0)->boosted()->create(['user_id' => $user->id, 'game_id' => $game->id]);
 
     $this->actingAs($user);

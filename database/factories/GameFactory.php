@@ -15,7 +15,7 @@ class GameFactory extends Factory
     {
         return [
             'api_id'       => fake()->unique()->randomNumber(6),
-            'kickoff_at'   => now()->addDays(fake()->numberBetween(1, 30)),
+            'kickoff_at'   => now()->utc()->addDays(fake()->numberBetween(1, 30)),
             'status'       => 'SCHEDULED',
             'stage'        => 'GROUP_STAGE',
             'group'        => fake()->randomElement(['GROUP_A', 'GROUP_B', 'GROUP_C', 'GROUP_D']),
@@ -36,7 +36,7 @@ class GameFactory extends Factory
     {
         return $this->state(fn () => [
             'status'     => 'FINISHED',
-            'kickoff_at' => now()->subDays(1),
+            'kickoff_at' => now()->utc()->subDays(1),
             'home_score' => $homeScore,
             'away_score' => $awayScore,
         ]);
@@ -46,7 +46,7 @@ class GameFactory extends Factory
     {
         return $this->state(fn () => [
             'status'     => 'IN_PLAY',
-            'kickoff_at' => now()->subMinutes(30),
+            'kickoff_at' => now()->utc()->subMinutes(30),
         ]);
     }
 }
