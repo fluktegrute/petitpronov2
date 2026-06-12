@@ -71,30 +71,41 @@ class UpdateMatches extends Command
 
                 $bracketSlot = $this->determineBracketSlot($match, $homeTeam, $awayTeam);
 
-                $game = Game::updateOrCreate(
-                    [
-                        'api_id' => $match['id'],
-                    ],
-                    [
-                        'kickoff_at'        => Carbon::parse($match['utcDate'])->format('Y-m-d H:i:s'),
-                        'status'            => $match['status'],
-                        'stage'             => $match['stage'],
-                        'group'             => $match['group'],
-                        'bracket_slot'      => $bracketSlot,
-                        'matchday'          => $match['matchday'],
-                        'home_team_id'      => $homeTeam->id,
-                        'away_team_id'      => $awayTeam->id,
-                        'home_score'        => $match['score']['fullTime']['home'],
-                        'away_score'        => $match['score']['fullTime']['away'],
-                        'winner_team_id'    => $match['score']['winner'] == 'HOME_TEAM' ? $homeTeam->id : ($match['score']['winner'] == 'AWAY_TEAM' ? $awayTeam->id : null),
-                    ]
-                );
+                $game = Game::firstOrNew(['api_id' => $match['id']]);
+
+                $game->fill([
+                    'kickoff_at'   => Carbon::parse($match['utcDate'])->format('Y-m-d H:i:s'),
+                    'status'       => $game->status === 'FINISHED' ? 'FINISHED' : $match['status'],
+                    'stage'        => $match['stage'],
+                    'group'        => $match['group'],
+                    'bracket_slot' => $bracketSlot,
+                    'matchday'     => $match['matchday'],
+                    'home_team_id' => $homeTeam->id,
+                    'away_team_id' => $awayTeam->id,
+                ])->save();
 
                 $this->displayLogs('Match updated');
 
-                if ($game->wasChanged('status') && $game->status === 'FINISHED') {
+                $apiHomeScore = $match['score']['fullTime']['home'];
+                $apiAwayScore = $match['score']['fullTime']['away'];
+                $apiWinner    = $match['score']['winner'];
+
+                $apiScoresValid = !is_null($apiHomeScore) && !is_null($apiAwayScore) && (
+                    ($apiHomeScore > $apiAwayScore && $apiWinner === 'HOME_TEAM') ||
+                    ($apiHomeScore < $apiAwayScore && $apiWinner === 'AWAY_TEAM') ||
+                    ($apiHomeScore === $apiAwayScore && $apiWinner === 'DRAW')
+                );
+
+                if($game->status === 'FINISHED' && $apiScoresValid && is_null($game->home_score)){
+                    $game->update([
+                        'home_score'     => $apiHomeScore,
+                        'away_score'     => $apiAwayScore,
+                        'winner_team_id' => $apiWinner === 'HOME_TEAM' ? $homeTeam->id : ($apiWinner === 'AWAY_TEAM' ? $awayTeam->id : null),
+                    ]);
+                    $game->refresh();
+
                     $this->displayLogs('Match newly finished, updating teams score and points');
-                    
+
                     $this->updateTeamStats($homeTeam, $match['score'], 'home');
                     $this->updateTeamStats($awayTeam, $match['score'], 'away');
 
@@ -156,31 +167,31 @@ class UpdateMatches extends Command
 
                         $prediction->save();
                     }
-
-                    $this->displayLogs('Users predictions updated. Calculating players total score...');
-
-                    $userIds = Prediction::where('game_id', $game->id)->pluck('user_id')->unique();
-
-                    foreach ($userIds as $userId) {
-                        $stats = Prediction::where('user_id', $userId)
-                            ->selectRaw("
-                                COALESCE(SUM(points), 0) as total_points,
-                                SUM(CASE WHEN status = 'exact' THEN 1 ELSE 0 END) as exact_count,
-                                SUM(CASE WHEN status = 'trend' THEN 1 ELSE 0 END) as trend_count,
-                                SUM(CASE WHEN status != 'placed' THEN 1 ELSE 0 END) as prono_count
-                            ")
-                            ->first();
-
-                        User::where('id', $userId)->update([
-                            'total_points' => $stats->total_points,
-                            'exact_count'  => $stats->exact_count ?? 0,
-                            'trend_count'  => $stats->trend_count ?? 0,
-                            'prono_count'  => $stats->prono_count ?? 0,
-                        ]);
-                    }
-
-                    $this->displayLogs('Done');
                 }
+
+                $this->displayLogs('Users predictions updated. Calculating players total score...');
+
+                $userIds = Prediction::where('game_id', $game->id)->pluck('user_id')->unique();
+
+                foreach ($userIds as $userId) {
+                    $stats = Prediction::where('user_id', $userId)
+                        ->selectRaw("
+                            COALESCE(SUM(points), 0) as total_points,
+                            SUM(CASE WHEN status = 'exact' THEN 1 ELSE 0 END) as exact_count,
+                            SUM(CASE WHEN status = 'trend' THEN 1 ELSE 0 END) as trend_count,
+                            SUM(CASE WHEN status != 'placed' THEN 1 ELSE 0 END) as prono_count
+                        ")
+                        ->first();
+
+                    User::where('id', $userId)->update([
+                        'total_points' => $stats->total_points,
+                        'exact_count'  => $stats->exact_count ?? 0,
+                        'trend_count'  => $stats->trend_count ?? 0,
+                        'prono_count'  => $stats->prono_count ?? 0,
+                    ]);
+                }
+
+                $this->displayLogs('Done');
             }
         }
     }
