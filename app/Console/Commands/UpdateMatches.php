@@ -204,8 +204,11 @@ class UpdateMatches extends Command
             $contentType = $response->header('Content-Type');
             $mimeTypes = new MimeTypes();
             $extensions = $mimeTypes->getExtensions($contentType);
-            $extension = $extensions[0] ?? 'svg';
-            $filename = 'images/flags/' . $match[$team]['id'] . '.' . $extension;
+
+            $allowedExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'];
+            $extension = in_array($extensions[0] ?? '', $allowedExtensions, true) ? $extensions[0] : 'png';
+            $teamId = (int) $match[$team]['id'];
+            $filename = 'images/flags/' . $teamId . '.' . $extension;
             Storage::disk('public')->put($filename, $response->body());
 
             $createdTeam = Team::create([

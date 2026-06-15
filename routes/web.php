@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\FlagController;
+use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Middleware\EnsureUserIsAdmin;
+Route::get('/flags/{filename}', FlagController::class)
+    ->where('filename', '[a-zA-Z0-9._-]+')
+    ->name('flags');
 
 Route::get('/', function(){
     return view('welcome');

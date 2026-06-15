@@ -30,6 +30,19 @@ class Team extends Model
         );
     }
 
+    protected function flagPath(): Attribute
+    {
+        return Attribute::make(
+            get: function() {
+                $raw = $this->attributes['flag_path'] ?? '';
+                if (str_starts_with($raw, 'storage/images/flags/')) {
+                    return 'flags/' . basename($raw);
+                }
+                return $raw;
+            }
+        );
+    }
+
     protected function nameFr(): Attribute
     {
         return Attribute::make(

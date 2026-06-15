@@ -97,16 +97,10 @@
                         <p class="px-4 py-2 border border-red-600 text-red-600 bg-red-500/10 rounded-lg mt-2 text-xs italic bold">Attention : une fois le tournoi démarré, ce choix ne pourra plus être modifié !</p>
                         @error('winner_team_id') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                     </div>
-                @else
+                @elseif(auth()->user()->winner_team_id)
                     <div class="pt-4 border-t border-slate-50">
-                        <p class="block text-sm font-bold text-slate-900 mb-2">
-                            Trop tard pour choisir ou modifier ton prono sur le vainqueur final...
-                        </p>
-                        @if(auth()->user()->winner_team_id)
-                            Tu as choisi comme Poney : <span class="font-bold italic">{{ auth()->user()->winnerTeam->nameFr }}</span>
-                        @else
-                            <span class="font-bold italic">Dommage, tu n'as pas choisi de Poney :(</span>
-                        @endif
+                        <p class="block text-sm font-bold text-slate-900 mb-2">🏆 Ton Poney (le vainqueur final)</p>
+                        <p>Tu as choisi : <span class="font-bold italic">{{ auth()->user()->winnerTeam->nameFr }}</span></p>
                     </div>
                 @endif
 

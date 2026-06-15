@@ -133,7 +133,14 @@ new class extends Component
 
     public function updatedDescription(): void
     {
-        if($this->isUserAdmin)
-            $this->league->update(['description' => $this->description ?? '']);
+        if(!$this->isUserAdmin)
+            return;
+
+        $this->validate(
+            ['description' => 'nullable|string|max:1000'],
+            ['description.max' => 'La description ne peut pas faire plus de 1000 caractères.']
+        );
+
+        $this->league->update(['description' => $this->description ?? '']);
     }
 };

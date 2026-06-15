@@ -50,7 +50,7 @@ new class extends Component
                     'max:30',
                     Rule::unique('users')->ignore($this->userId), 
                 ],
-                'email' => 'required|email',
+                'email' => ['required', 'email', Rule::unique('users')->ignore($this->userId)],
                 'winner_team_id' => 'nullable|numeric|exists:teams,id',
                 'photo' => 'nullable|image|max:2048'
             ],
@@ -69,9 +69,13 @@ new class extends Component
 
         
         $dataToUpdate = [
-            'name' => $this->name,
+            'name'  => $this->name,
             'email' => $this->email,
         ];
+
+        if ($this->email !== auth()->user()->email) {
+            $dataToUpdate['email_verified_at'] = null;
+        }
 
         if(now()->isBefore($this->firstGame->kickoff_at)){
             $dataToUpdate['winner_team_id'] = $this->winner_team_id;

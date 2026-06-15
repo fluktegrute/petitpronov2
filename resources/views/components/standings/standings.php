@@ -1,5 +1,6 @@
 <?php
 
+use App\Concerns\HasTournamentState;
 use App\Models\Game;
 use App\Models\Team;
 
@@ -10,6 +11,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use HasTournamentState;
+
     public string $tab = "poolPhase";
 
     #[Computed]

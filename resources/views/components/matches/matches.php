@@ -1,16 +1,19 @@
 <?php
 
+use App\Concerns\HasTournamentState;
 use App\Models\Game;
 use App\Models\MatchHistory;
 use App\Models\Prediction;
 use App\Models\Team;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 new class extends Component
 {
+    use HasTournamentState;
     public array $predictions = [];
     public string $tab = 'upcoming';
     public bool $h2hModalOpened = false;
@@ -22,6 +25,13 @@ new class extends Component
     public function mount(): void
     {
         $this->predictions = Prediction::where('user_id', auth()->id())->get()->keyBy('game_id')->toArray();
+    }
+
+    #[Computed]
+    public function tournamentStarted(): bool
+    {
+        $first = Game::orderBy('kickoff_at')->value('kickoff_at');
+        return $first !== null && now()->isAfter($first);
     }
 
     #[Computed]
@@ -136,62 +146,81 @@ new class extends Component
 
     private function saveSinglePrediction(int $gameId): void
     {
+        $this->validate(
+            [
+                "predictions.{$gameId}.home_score" => 'nullable|integer|min:0|max:99',
+                "predictions.{$gameId}.away_score" => 'nullable|integer|min:0|max:99',
+            ],
+            [
+                "predictions.{$gameId}.home_score.integer" => 'Le score doit être un entier.',
+                "predictions.{$gameId}.home_score.min"     => 'Le score ne peut pas être négatif.',
+                "predictions.{$gameId}.home_score.max"     => 'Le score ne peut pas dépasser 99.',
+                "predictions.{$gameId}.away_score.integer" => 'Le score doit être un entier.',
+                "predictions.{$gameId}.away_score.min"     => 'Le score ne peut pas être négatif.',
+                "predictions.{$gameId}.away_score.max"     => 'Le score ne peut pas dépasser 99.',
+            ]
+        );
+
         $game = Game::findOrFail($gameId);
-        $user = auth()->user();
+        $pronoData = $this->predictions[$gameId];
 
         // Contrôle anti-triche
         if(now()->isAfter($game->kickoff_at)){
             Prediction::updateOrCreate(
-                ['user_id' => $user->id, 'game_id' => $gameId],
+                ['user_id' => auth()->id(), 'game_id' => $gameId],
                 ['status' => 'cheated']
             );
-            return; 
+            return;
         }
 
-        $pronoData = $this->predictions[$gameId];
-        $prediction = Prediction::where('user_id', $user->id)->where('game_id', $gameId)->first();
-        
         $wantsBoost = $pronoData['is_boosted'] ?? false;
+        $homeScore  = isset($pronoData['home_score']) && $pronoData['home_score'] !== '' ? (int) $pronoData['home_score'] : null;
+        $awayScore  = isset($pronoData['away_score']) && $pronoData['away_score'] !== '' ? (int) $pronoData['away_score'] : null;
 
-        if(!$prediction){
+        DB::transaction(function() use ($gameId, $wantsBoost, $homeScore, $awayScore) {
+            $user = \App\Models\User::where('id', auth()->id())->lockForUpdate()->first();
 
-            $canBoost = $wantsBoost && $user->boosts_remaining > 0;
+            $prediction = Prediction::where('user_id', $user->id)->where('game_id', $gameId)->first();
 
-            Prediction::create([
-                'user_id'    => $user->id,
-                'game_id'    => $gameId,
-                'home_score' => isset($pronoData['home_score']) && $pronoData['home_score'] !== '' ? $pronoData['home_score'] : null,
-                'away_score' => isset($pronoData['away_score']) && $pronoData['away_score'] !== '' ? $pronoData['away_score'] : null,
-                'is_boosted' => $canBoost,
-                'status'     => 'placed',
-            ]);
+            if(!$prediction){
+                $canBoost = $wantsBoost && $user->boosts_remaining > 0;
 
-            if($canBoost){
-                $user->decrement('boosts_remaining'); 
-            }
-        } 
-        else{
-            $boostStatus = $prediction->is_boosted;
+                Prediction::create([
+                    'user_id'    => $user->id,
+                    'game_id'    => $gameId,
+                    'home_score' => $homeScore,
+                    'away_score' => $awayScore,
+                    'is_boosted' => $canBoost,
+                    'status'     => 'placed',
+                ]);
 
-            if($prediction->is_boosted && !$wantsBoost){
-                $user->increment('boosts_remaining');
-                $boostStatus = false;
-            }
-            elseif(!$prediction->is_boosted && $wantsBoost){
-                if($user->boosts_remaining > 0){
-                    $user->decrement('boosts_remaining'); 
-                    $boostStatus = true;
-                }
-                else{
-                    $boostStatus = false; 
+                if($canBoost){
+                    $user->decrement('boosts_remaining');
                 }
             }
+            else{
+                $boostStatus = $prediction->is_boosted;
 
-            $prediction->update([
-                'home_score' => isset($pronoData['home_score']) && $pronoData['home_score'] !== '' ? $pronoData['home_score'] : null,
-                'away_score' => isset($pronoData['away_score']) && $pronoData['away_score'] !== '' ? $pronoData['away_score'] : null,
-                'is_boosted' => $boostStatus,
-            ]);
-        }
+                if($prediction->is_boosted && !$wantsBoost){
+                    $user->increment('boosts_remaining');
+                    $boostStatus = false;
+                }
+                elseif(!$prediction->is_boosted && $wantsBoost){
+                    if($user->boosts_remaining > 0){
+                        $user->decrement('boosts_remaining');
+                        $boostStatus = true;
+                    }
+                    else{
+                        $boostStatus = false;
+                    }
+                }
+
+                $prediction->update([
+                    'home_score' => $homeScore,
+                    'away_score' => $awayScore,
+                    'is_boosted' => $boostStatus,
+                ]);
+            }
+        });
     }
 };
