@@ -25,7 +25,7 @@ class UpdateMatches extends Command
 {
     use LogsWithTimestamps;
 
-    protected $signature = "matches:update {--fake : Simule l'appel API avec de faux résultats}";
+    protected $signature = "matches:update {--fake : Simule l'appel API avec de faux résultats} {--force : Force la mise à jour du score même s'il est déjà enregistré (recalcule les stats et pronostics)}";
 
     /**
      * Execute the console command.
@@ -96,7 +96,14 @@ class UpdateMatches extends Command
                     ($apiHomeScore === $apiAwayScore && $apiWinner === 'DRAW')
                 );
 
-                if($game->status === 'FINISHED' && $apiScoresValid && is_null($game->home_score)){
+                $scoreAlreadySet = !is_null($game->home_score);
+                $shouldUpdateScore = $game->status === 'FINISHED' && $apiScoresValid && (!$scoreAlreadySet || $this->option('force'));
+
+                if($shouldUpdateScore){
+                    $scoreChanged = !$scoreAlreadySet
+                        || $game->home_score !== $apiHomeScore
+                        || $game->away_score !== $apiAwayScore;
+
                     $game->update([
                         'home_score'     => $apiHomeScore,
                         'away_score'     => $apiAwayScore,
@@ -104,10 +111,15 @@ class UpdateMatches extends Command
                     ]);
                     $game->refresh();
 
-                    $this->displayLogs('Match newly finished, updating teams score and points');
-
-                    $this->updateTeamStats($homeTeam, $match['score'], 'home');
-                    $this->updateTeamStats($awayTeam, $match['score'], 'away');
+                    if (!$scoreAlreadySet) {
+                        $this->displayLogs('Match newly finished, updating teams score and points');
+                        $this->updateTeamStats($homeTeam, $match['score'], 'home');
+                        $this->updateTeamStats($awayTeam, $match['score'], 'away');
+                    } elseif ($scoreChanged) {
+                        $this->displayLogs('Score corrigé, recalcul des stats des équipes depuis zéro');
+                        $this->recalculateTeamStats($homeTeam);
+                        $this->recalculateTeamStats($awayTeam);
+                    }
 
                     if($game->group)
                         $this->updateTeamsRankings($game->group);
@@ -248,7 +260,41 @@ class UpdateMatches extends Command
         ]);
     }
 
-    private function updateTeamsRankings(?string $pool): void 
+    private function recalculateTeamStats(Team $team): void
+    {
+        $played = 0; $won = 0; $draw = 0; $lost = 0; $points = 0; $goalsFor = 0; $goalsAgainst = 0;
+
+        foreach (Game::where('home_team_id', $team->id)->whereNotNull('home_score')->get() as $game) {
+            $played++;
+            $goalsFor     += $game->home_score;
+            $goalsAgainst += $game->away_score;
+            if ($game->home_score > $game->away_score)      { $won++;  $points += 3; }
+            elseif ($game->home_score === $game->away_score) { $draw++; $points += 1; }
+            else                                             { $lost++; }
+        }
+
+        foreach (Game::where('away_team_id', $team->id)->whereNotNull('home_score')->get() as $game) {
+            $played++;
+            $goalsFor     += $game->away_score;
+            $goalsAgainst += $game->home_score;
+            if ($game->away_score > $game->home_score)      { $won++;  $points += 3; }
+            elseif ($game->away_score === $game->home_score) { $draw++; $points += 1; }
+            else                                             { $lost++; }
+        }
+
+        $team->update([
+            'played'        => $played,
+            'won'           => $won,
+            'draw'          => $draw,
+            'lost'          => $lost,
+            'points'        => $points,
+            'goals_for'     => $goalsFor,
+            'goals_against' => $goalsAgainst,
+            'goal_diff'     => $goalsFor - $goalsAgainst,
+        ]);
+    }
+
+    private function updateTeamsRankings(?string $pool): void
     {
         if(!$pool)
             return;

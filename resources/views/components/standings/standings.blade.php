@@ -85,7 +85,7 @@
 
                                         <td class="px-2 py-3 text-center font-medium text-slate-600">{{ $team->played ?? 0 }}</td>
                                         <td class="px-2 py-3 text-center text-slate-500 hidden sm:table-cell">{{ $team->won ?? 0 }}</td>
-                                        <td class="px-2 py-3 text-center text-slate-500 hidden sm:table-cell">{{ $team->drawn ?? 0 }}</td>
+                                        <td class="px-2 py-3 text-center text-slate-500 hidden sm:table-cell">{{ $team->draw ?? 0 }}</td>
                                         <td class="px-2 py-3 text-center text-slate-500 hidden sm:table-cell">{{ $team->lost ?? 0 }}</td>
 
                                         <td class="px-2 py-3 text-center font-semibold hidden sm:table-cell">
@@ -120,7 +120,7 @@
             @endforeach
         </div>
 
-        <div class="w-1/2 mx-auto">
+        <div class="w-5/6 mx-auto lg:w-1/2">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-shadow hover:shadow-md">
                 
                 <div class="bg-slate-50 px-5 py-4 border-b border-slate-200 flex justify-between items-center">
@@ -171,7 +171,7 @@
 
                                     <td class="px-2 py-3 text-center font-medium text-slate-600">{{ $team->played ?? 0 }}</td>
                                     <td class="px-2 py-3 text-center text-slate-500 hidden sm:table-cell">{{ $team->won ?? 0 }}</td>
-                                    <td class="px-2 py-3 text-center text-slate-500 hidden sm:table-cell">{{ $team->drawn ?? 0 }}</td>
+                                    <td class="px-2 py-3 text-center text-slate-500 hidden sm:table-cell">{{ $team->draw ?? 0 }}</td>
                                     <td class="px-2 py-3 text-center text-slate-500 hidden sm:table-cell">{{ $team->lost ?? 0 }}</td>
                                     
                                     <td class="px-2 py-3 text-center font-semibold">
