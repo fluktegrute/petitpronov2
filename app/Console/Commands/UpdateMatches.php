@@ -86,15 +86,31 @@ class UpdateMatches extends Command
 
                 $this->displayLogs('Match updated');
 
-                $apiHomeScore = $match['score']['fullTime']['home'];
-                $apiAwayScore = $match['score']['fullTime']['away'];
-                $apiWinner    = $match['score']['winner'];
+                // Score à 90' : on préfère regularTime quand il y a eu des prolongations/tirs au but
+                $duration = $match['score']['duration'] ?? 'REGULAR';
+                $regularTimeHome = $match['score']['regularTime']['home'] ?? null;
+                $regularTimeAway = $match['score']['regularTime']['away'] ?? null;
 
-                $apiScoresValid = !is_null($apiHomeScore) && !is_null($apiAwayScore) && (
-                    ($apiHomeScore > $apiAwayScore && $apiWinner === 'HOME_TEAM') ||
-                    ($apiHomeScore < $apiAwayScore && $apiWinner === 'AWAY_TEAM') ||
-                    ($apiHomeScore === $apiAwayScore && $apiWinner === 'DRAW')
-                );
+                if ($duration !== 'REGULAR' && !is_null($regularTimeHome) && !is_null($regularTimeAway)) {
+                    $apiHomeScore = $regularTimeHome;
+                    $apiAwayScore = $regularTimeAway;
+                } else {
+                    $apiHomeScore = $match['score']['fullTime']['home'];
+                    $apiAwayScore = $match['score']['fullTime']['away'];
+                }
+
+                // Vainqueur à 90' (dérivé du score, pas du champ winner qui reflète le résultat final)
+                $apiWinner = match(true) {
+                    is_null($apiHomeScore) || is_null($apiAwayScore) => null,
+                    $apiHomeScore > $apiAwayScore                    => 'HOME_TEAM',
+                    $apiHomeScore < $apiAwayScore                    => 'AWAY_TEAM',
+                    default                                          => 'DRAW',
+                };
+
+                // Vainqueur réel du match (peut différer en cas de prolongations/TAB)
+                $apiActualWinner = $match['score']['winner'];
+
+                $apiScoresValid = !is_null($apiWinner);
 
                 $scoreAlreadySet = !is_null($game->home_score);
                 $shouldUpdateScore = $game->status === 'FINISHED' && $apiScoresValid && (!$scoreAlreadySet || $this->option('force'));
@@ -107,14 +123,14 @@ class UpdateMatches extends Command
                     $game->update([
                         'home_score'     => $apiHomeScore,
                         'away_score'     => $apiAwayScore,
-                        'winner_team_id' => $apiWinner === 'HOME_TEAM' ? $homeTeam->id : ($apiWinner === 'AWAY_TEAM' ? $awayTeam->id : null),
+                        'winner_team_id' => $apiActualWinner === 'HOME_TEAM' ? $homeTeam->id : ($apiActualWinner === 'AWAY_TEAM' ? $awayTeam->id : null),
                     ]);
                     $game->refresh();
 
                     if (!$scoreAlreadySet) {
                         $this->displayLogs('Match newly finished, updating teams score and points');
-                        $this->updateTeamStats($homeTeam, $match['score'], 'home');
-                        $this->updateTeamStats($awayTeam, $match['score'], 'away');
+                        $this->updateTeamStats($homeTeam, $apiHomeScore, $apiAwayScore);
+                        $this->updateTeamStats($awayTeam, $apiAwayScore, $apiHomeScore);
                     } elseif ($scoreChanged) {
                         $this->displayLogs('Score corrigé, recalcul des stats des équipes depuis zéro');
                         $this->recalculateTeamStats($homeTeam);
@@ -239,24 +255,21 @@ class UpdateMatches extends Command
         return $createdTeam;
     }
 
-    private function updateTeamStats(Team $team, array $score, string $side): void
+    private function updateTeamStats(Team $team, int $goalsFor, int $goalsAgainst): void
     {
-        $goalsFor = $score['fullTime'][$side];
-        $goalsAgainst = $score['fullTime'][$side === 'home' ? 'away' : 'home'];
-
-        $isWinner = ($score['winner'] === strtoupper($side) . '_TEAM');
-        $isDraw = ($score['winner'] === 'DRAW');
-        $isLoser = (!$isWinner && !$isDraw);
+        $isWinner = $goalsFor > $goalsAgainst;
+        $isDraw   = $goalsFor === $goalsAgainst;
+        $isLoser  = $goalsFor < $goalsAgainst;
 
         $team->update([
-            'played' => $team->played + 1,
-            'won' => $team->won + ($isWinner ? 1 : 0),
-            'draw' => $team->draw + ($isDraw ? 1 : 0),
-            'lost' => $team->lost + ($isLoser ? 1 : 0),
-            'points' => $team->points + ($isWinner ? 3 : ($isDraw ? 1 : 0)),
-            'goals_for' => $team->goals_for + $goalsFor,
+            'played'        => $team->played + 1,
+            'won'           => $team->won  + ($isWinner ? 1 : 0),
+            'draw'          => $team->draw + ($isDraw   ? 1 : 0),
+            'lost'          => $team->lost + ($isLoser  ? 1 : 0),
+            'points'        => $team->points + ($isWinner ? 3 : ($isDraw ? 1 : 0)),
+            'goals_for'     => $team->goals_for     + $goalsFor,
             'goals_against' => $team->goals_against + $goalsAgainst,
-            'goal_diff' => ($team->goals_for + $goalsFor) - ($team->goals_against + $goalsAgainst),
+            'goal_diff'     => ($team->goals_for + $goalsFor) - ($team->goals_against + $goalsAgainst),
         ]);
     }
 
