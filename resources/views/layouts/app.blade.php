@@ -165,6 +165,9 @@
             </p>
         </div>
     </footer>
+    @auth
+        @livewire('final-recap')
+    @endauth
     @livewireScripts
 </body>
 </html>

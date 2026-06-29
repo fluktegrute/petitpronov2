@@ -132,7 +132,7 @@ class UpdateMatches extends Command
                         $this->updateTeamStats($homeTeam, $apiHomeScore, $apiAwayScore);
                         $this->updateTeamStats($awayTeam, $apiAwayScore, $apiHomeScore);
                     } elseif ($scoreChanged) {
-                        $this->displayLogs('Score corrigé, recalcul des stats des équipes depuis zéro');
+                        $this->displayLogs('Score changed, recalculating teams stats from scratch');
                         $this->recalculateTeamStats($homeTeam);
                         $this->recalculateTeamStats($awayTeam);
                     }

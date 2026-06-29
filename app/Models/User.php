@@ -16,7 +16,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'email', 'password', 'boosts_remaining', 'winner_team_id', 'total_points', 'prono_count', 'trend_count', 'exact_count', 'avatar_path', 'notify_match_reminder', 'notify_daily_recap'])]
+#[Fillable(['name', 'email', 'password', 'boosts_remaining', 'winner_team_id', 'total_points', 'prono_count', 'trend_count', 'exact_count', 'avatar_path', 'notify_match_reminder', 'notify_daily_recap', 'seen_final_modal'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -35,6 +35,7 @@ class User extends Authenticatable
             'password'               => 'hashed',
             'notify_match_reminder'  => 'boolean',
             'notify_daily_recap'     => 'boolean',
+            'seen_final_modal'       => 'boolean',
         ];
     }
 
