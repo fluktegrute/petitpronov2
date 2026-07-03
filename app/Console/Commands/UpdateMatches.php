@@ -69,9 +69,10 @@ class UpdateMatches extends Command
                     continue;
                 }
 
-                $bracketSlot = $this->determineBracketSlot($match, $homeTeam, $awayTeam);
-
                 $game = Game::firstOrNew(['api_id' => $match['id']]);
+
+                // Un échec ponctuel de résolution ne doit jamais effacer un slot déjà correctement assigné
+                $bracketSlot = $this->determineBracketSlot($match, $homeTeam, $awayTeam) ?? $game->bracket_slot;
 
                 $game->fill([
                     'kickoff_at'   => Carbon::parse($match['utcDate'])->format('Y-m-d H:i:s'),
@@ -440,16 +441,33 @@ class UpdateMatches extends Command
 
         if(in_array($stage, ['LAST_16', 'QUARTER_FINALS', 'SEMI_FINALS'])){
 
-            $previousGame = Game::where(function($q) use ($homeTeam) {
+            $previousStage = match($stage) {
+                'LAST_16'        => 'LAST_32',
+                'QUARTER_FINALS' => 'LAST_16',
+                'SEMI_FINALS'    => 'QUARTER_FINALS',
+            };
+
+            $previousGame = Game::where('stage', $previousStage)
+                ->where(function($q) use ($homeTeam) {
                     $q->where('home_team_id', $homeTeam->id)
                     ->orWhere('away_team_id', $homeTeam->id);
                 })
                 ->whereNotNull('bracket_slot')
-                ->orderBy('kickoff_at', 'desc') 
                 ->first();
 
             if(!$previousGame){
-                return null; 
+                $previousGame = Game::where('stage', $previousStage)
+                    ->where(function($q) use ($awayTeam) {
+                        $q->where('home_team_id', $awayTeam->id)
+                        ->orWhere('away_team_id', $awayTeam->id);
+                    })
+                    ->whereNotNull('bracket_slot')
+                    ->first();
+            }
+
+            if(!$previousGame){
+                $this->displayLogs("Impossible de déterminer le bracket_slot du match {$stage} (équipes #{$homeTeam->id}/#{$awayTeam->id}) : aucun match {$previousStage} avec un slot trouvé", 'error');
+                return null;
             }
 
             $p = $previousGame->bracket_slot;
